@@ -7,6 +7,13 @@ for p in $path[-1..1]
   end
 end
 
+# update database of frecently visited directories/files
+if type -q fasd
+  function update_fasd_db --on-event fish_preexec
+    fasd --proc (fasd --sanitize $argv) &>/dev/null
+  end
+end
+
 # python
 set -x VIRTUAL_ENV_DISABLE_PROMPT 1
 
