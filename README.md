@@ -22,7 +22,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/dlukes/go
 ```
 
 Alternatively, you can just clone this repo as `~/.config/fish` and
-install all or just some of the software by hand. Here's a list of
+install all or just some of the software by hand (or maybe it has
+already been installed by your system administrator). Here's a list of
 what's included, with links:
 
 - the [`fish` shell] itself
