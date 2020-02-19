@@ -1,5 +1,28 @@
 #!/bin/sh
 
+#=======================================================================
+# PRELIMINARIES
+#=======================================================================
+
+#-----------------------------------------------------------------------
+# Configuration
+#-----------------------------------------------------------------------
+
+# exit immediately if an error is encountered
+set -e
+
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+prefix=/usr/local
+mandir="$prefix/share/man/man1"
+bindir="$prefix/bin"
+fish_conf_dir="$HOME/.config/fish"
+fonts_confd=/etc/fonts/conf.d
+fontconfig_overrides="$fonts_confd/00-overrides.conf"
+
+#-----------------------------------------------------------------------
+# Functions
+#-----------------------------------------------------------------------
+
 log() {
   msg="$1"
   color="$2"
@@ -24,41 +47,6 @@ error() {
   log "$msg" '[31m'
 }
 
-# check that we're not running as root
-if [ $( id -u ) -eq 0 ]; then
-  error "\
-This script should be run as a regular user, it will request sudo
-privileges where appropriate.\
-"
-  exit 1
-fi
-
-# check for commands which might not be present
-cmds='curl git dpkg apt-add-repository apt-get mandb unzip'
-for cmd in $cmds; do
-  if ! command -v $cmd >/dev/null; then
-    error "This script needs the command '$cmd' to run but it wasn't found."
-    abort=1
-  fi
-done
-if [ -n "$abort" ]; then
-  error 'Some required commands are missing, please install them first.'
-  exit 1
-fi
-
-# exit immediately if an error is encountered
-set -e
-# trace the execution of the script to pinpoint problem in case of
-# failure
-set -x
-
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
-prefix='/usr/local'
-mandir="$prefix/share/man/man1"
-bindir="$prefix/bin"
-fish_conf_dir="$HOME/.config/fish"
-sudo mkdir -p "$mandir" "$bindir"
-
 fetch_and_install_deb() {
   cmdname="$1"
   repo="$2"
@@ -72,6 +60,44 @@ fetch_and_install_deb() {
     sudo dpkg --force-overwrite -i $( basename "$release_link" )
   fi
 }
+
+#-----------------------------------------------------------------------
+# Check that we're not running as root
+#-----------------------------------------------------------------------
+
+if [ $( id -u ) -eq 0 ]; then
+  error "\
+This script should be run as a regular user, it will request sudo
+privileges where appropriate.\
+"
+  exit 1
+fi
+
+#-----------------------------------------------------------------------
+# Check for required commands which might not be present
+#-----------------------------------------------------------------------
+
+cmds='curl git dpkg apt-add-repository apt-get mandb unzip'
+for cmd in $cmds; do
+  if ! command -v $cmd >/dev/null; then
+    error "This script needs the command '$cmd' to run but it wasn't found."
+    abort=1
+  fi
+done
+if [ -n "$abort" ]; then
+  error 'Some required commands are missing, please install them first.'
+  exit 1
+fi
+
+#=======================================================================
+# INSTALLATION
+#=======================================================================
+
+# trace the execution of the script to pinpoint problem in case of
+# failure
+set -x
+
+sudo mkdir -p "$mandir" "$bindir"
 
 #-----------------------------------------------------------------------
 # Clone fish config
@@ -206,9 +232,6 @@ fetch_and_install_deb fd sharkdp/fd 'fd_.*?_amd64.deb'
 #-----------------------------------------------------------------------
 # Fix Ubuntu Mono fontconfig substitution rules (prompt uses Unicode)
 #-----------------------------------------------------------------------
-
-fonts_confd="/etc/fonts/conf.d"
-fontconfig_overrides="$fonts_confd/00-overrides.conf"
 
 if [ ! -d "$fonts_confd" ]; then
   set +x
