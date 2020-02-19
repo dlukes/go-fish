@@ -8,7 +8,9 @@ If you're on a reasonably recent Ubuntu system and just want to install
 and set up everything automatically, run:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/dlukes/go-fish/master/gofi.sh | sh
+curl --proto '=https' --tlsv1.2 -sSf \
+  https://raw.githubusercontent.com/dlukes/go-fish/master/gofi.sh |
+  sh
 ```
 
 Of course, feel free to take a look at the script first to see what it
@@ -18,7 +20,9 @@ Force re-installing all packages by setting the `GOFISH_FORCE`
 environment variable:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/dlukes/go-fish/master/gofi.sh | GOFISH_FORCE=1 sh
+curl --proto '=https' --tlsv1.2 -sSf \
+  https://raw.githubusercontent.com/dlukes/go-fish/master/gofi.sh |
+  GOFISH_FORCE=1 sh
 ```
 
 Alternatively, you can just clone this repo as `~/.config/fish` and
