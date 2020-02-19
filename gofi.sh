@@ -166,7 +166,7 @@ if ! command -v fzf >/dev/null || [ -n "$GOFISH_FORCE" ]; then
   sudo mkdir -p "$fzf_share"
   sudo mv fzf-*/shell "$fzf_share"
 
-  sudo mandb
+  update_man_db=1
 fi
 
 #-----------------------------------------------------------------------
@@ -183,7 +183,7 @@ if ! command -v fasd >/dev/null || [ -n "$GOFISH_FORCE" ]; then
   sudo mv fasd-*/fasd.1 "$mandir"
   sudo mv fasd-*/fasd "$bindir"
 
-  sudo mandb
+  update_man_db=1
 fi
 
 #-----------------------------------------------------------------------
@@ -310,6 +310,14 @@ configuration.
   </alias>
 </fontconfig>
 END
+fi
+
+#-----------------------------------------------------------------------
+# Update man db for good measure if some man pages were manually added
+#-----------------------------------------------------------------------
+
+if [ -n "$update_man_db" ]; then
+  sudo mandb >/dev/null
 fi
 
 set +x
