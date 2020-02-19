@@ -203,6 +203,92 @@ fetch_and_install_deb rg BurntSushi/ripgrep 'ripgrep_.*?_amd64.deb'
 
 fetch_and_install_deb fd sharkdp/fd 'fd_.*?_amd64.deb'
 
+#-----------------------------------------------------------------------
+# Fix Ubuntu Mono fontconfig substitution rules (prompt uses Unicode)
+#-----------------------------------------------------------------------
+
+fonts_confd="/etc/fonts/conf.d"
+fontconfig_overrides="$fonts_confd/00-overrides.conf"
+
+if [ ! -d "$fonts_confd" ]; then
+  set +x
+  warning "\
+========================================================================
+
+The directory
+
+$fonts_confd
+
+does not exist, will not attempt to fix Ubuntu Mono font substitution
+rules.
+
+========================================================================\
+"
+  set -x
+elif [ -e "$fontconfig_overrides" ]; then
+  set +x
+  warning "\
+========================================================================
+
+A file named
+
+$fontconfig_overrides
+
+already exists; refusing to overwrite it to fix Ubuntu Mono font
+substitution rules.
+
+========================================================================\
+"
+  set -x
+else
+  set +x
+  info "\
+========================================================================
+
+Installing fontconfig substitution overrides for Ubuntu Mono. This is
+because the default prompt uses Unicode characters which don't exist in
+Ubuntu Mono and get substituted by a sans-serif font by default because
+of improper configuration.
+
+If you're using a different font, you may have to tweak this override
+file:
+
+$fontconfig_overrides
+
+If you're installing this on a server which you'll be connecting to via
+ssh, you may have to configure these overrides on your local machine
+instead. Cf.:
+
+https://github.com/dlukes/go-fish#troubleshooting-unicode-glyphs-in-prompt
+
+NOTE: You may need to run 'fc-cache -fv' to update your fontconfig cache
+and/or open a new terminal window for these changes to take effect.
+
+========================================================================\
+"
+  set -x
+  cat <<'END' | sudo tee "$fontconfig_overrides"
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!--
+
+Added by https://github.com/dlukes/go-fish because the default prompt
+uses Unicode characters which don't exist in Ubuntu Mono and get
+substituted by a sans-serif font by default because of improper
+configuration.
+
+-->
+<fontconfig>
+  <alias>
+    <family>Ubuntu Mono</family>
+    <default>
+      <family>monospace</family>
+    </default>
+  </alias>
+</fontconfig>
+END
+fi
+
 set +x
 info "\
 ========================================================================

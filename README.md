@@ -77,6 +77,43 @@ These are just highlights of what this particular config adds on top of
   passphrases when they are used
 - ... and some more stuff, see `config.fish` and `functions/*`
 
+# Troubleshooting Unicode glyphs in prompt
+
+The default prompt uses Unicode characters which don't exist in Ubuntu
+Mono and get substituted by a sans-serif font by default because of
+improper configuration. This looks ugly, so the installation script
+tries to add fontconfig overrides for Ubuntu Mono which address this.
+
+However, maybe you're not using Ubuntu Mono, or maybe you're installing
+this on a server which you'll be accessing from your local machine. In
+these cases, you'll probably want to tweak this manually, i.e.
+modify/add a file under `/etc/fonts/conf.d/00-overrides.conf` with
+contents along the following lines:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>Ubuntu Mono</family>
+    <default>
+      <family>monospace</family>
+    </default>
+  </alias>
+</fontconfig>
+```
+
+Edit "Ubuntu Mono" to match the font you're using as needed.
+
+You may need to run `fc-cache -fv` to update your fontconfig cache
+and/or open a new terminal window for these changes to take effect.
+
+NOTE: If your local machine runs macOS or Windows, you don't need this.
+
+Alternatively, you can of course always just get rid of these characters
+by customizing `functions/fish_prompt.fish`, especially if you don't
+like them :)
+
 [`fish` shell]: https://fishshell.com/
 [`fasd`]: https://github.com/clvv/fasd/
 [`fzf`]: https://github.com/junegunn/fzf/
