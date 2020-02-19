@@ -126,9 +126,6 @@ mkdir -p "$fish_conf_dir"
 cd "$fish_conf_dir"
 git clone https://github.com/dlukes/go-fish .
 
-workdir=$( mktemp -d )
-cd "$workdir"
-
 #-----------------------------------------------------------------------
 # Add fish PPA and install it:
 #-----------------------------------------------------------------------
@@ -138,6 +135,13 @@ if ! command -v fish >/dev/null || [ -n "$GOFISH_FORCE" ]; then
   sudo apt-get update
   sudo apt-get install -o Dpkg::Options::=--force-overwrite -y fish
 fi
+
+#-----------------------------------------------------------------------
+# Perform all custom downloads in a temporary working directory
+#-----------------------------------------------------------------------
+
+workdir=$( mktemp -d )
+cd "$workdir"
 
 #-----------------------------------------------------------------------
 # Install fzf (for fuzzy-searching all the things™):
