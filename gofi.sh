@@ -1,8 +1,35 @@
 #!/bin/sh
 
+log() {
+  msg="$1"
+  color="$2"
+  if [ -n "$color" ]; then
+    reset='[0m'
+  fi
+  >&2 echo "$color$msg$reset"
+}
+
+info() {
+  msg="$1"
+  log "$msg" '[32m'
+}
+
+warning() {
+  msg="$1"
+  log "$msg" '[33m'
+}
+
+error() {
+  msg="$1"
+  log "$msg" '[31m'
+}
+
 # check that we're not running as root
 if [ $( id -u ) -eq 0 ]; then
-  >&2 echo 'This script should be run as a regular user, it will request sudo privileges where appropriate.'
+  error "\
+This script should be run as a regular user, it will request sudo
+privileges where appropriate.\
+"
   exit 1
 fi
 
@@ -10,12 +37,12 @@ fi
 cmds='curl git dpkg apt-add-repository apt-get mandb unzip'
 for cmd in $cmds; do
   if ! command -v $cmd >/dev/null; then
-    >&2 echo "This script needs the command '$cmd' to run but it wasn't found."
+    error "This script needs the command '$cmd' to run but it wasn't found."
     abort=1
   fi
 done
 if [ -n "$abort" ]; then
-  >&2 echo 'Some required commands are missing, please install them first.'
+  error 'Some required commands are missing, please install them first.'
   exit 1
 fi
 
@@ -53,12 +80,18 @@ fetch_and_install_deb() {
 if [ -d "$fish_conf_dir" ]; then
   disabled="$fish_conf_dir:disabled:$(date +%s)"
   set +x
-  >&2 echo -n "
+  warning "\
 ========================================================================
 
-Moving existing fish configuration directory $fish_conf_dir to $disabled
+Moving existing fish configuration directory:
 
-========================================================================
+$fish_conf_dir
+
+to:
+
+$disabled
+
+========================================================================\
 "
   set -x
   mv "$fish_conf_dir" "$disabled"
@@ -171,7 +204,7 @@ fetch_and_install_deb rg BurntSushi/ripgrep 'ripgrep_.*?_amd64.deb'
 fetch_and_install_deb fd sharkdp/fd 'fd_.*?_amd64.deb'
 
 set +x
->&2 echo -n "
+info "\
 ========================================================================
 
 All done. Temporary working directory was:
@@ -190,5 +223,5 @@ And the fish shell website for a tutorial and extensive documentation:
 
 https://fishshell.com/
 
-Have fun with the Friendly Interactive SHell!
+Have fun with the Friendly Interactive SHell!\
 "
