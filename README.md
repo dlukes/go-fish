@@ -1,6 +1,9 @@
 # Overview
 
-Set up the [`fish` shell] + some additional goodies on Ubuntu.
+Set up the [`fish` shell] + some additional goodies on Ubuntu. Take a
+look at the asciicast below for some highlights!
+
+[![asciicast](https://asciinema.org/a/303279.svg)](https://asciinema.org/a/303279)
 
 # Installation
 
