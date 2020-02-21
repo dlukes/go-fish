@@ -26,7 +26,9 @@ fontconfig_overrides="$fonts_confd/00-overrides.conf"
 # Functions
 #-----------------------------------------------------------------------
 
-width="$( seq 1 72 )"
+# NOTE: when used in an assignment, command substitution doesn't require
+# quoting; elsewhere (e.g. in a for-loop), it does
+width=$( seq 1 72 )
 log() {
   local msg="$1"
   local color="$2"
@@ -60,7 +62,7 @@ error() {
   log "$msg" '\e[31m' "$sep"
 }
 
-# Fetch installation archive if cmd is not available, else exit 2.
+# Fetch installation archive if cmd is not available, else return 2.
 maybe_fetch_archive() {
   local cmd="$1"
   local repo="$2"
@@ -73,13 +75,22 @@ maybe_fetch_archive() {
     curl -sLO "$release_link"
     basename "$release_link"
   else
-    exit 2
+    return 10
   fi
 }
 
 maybe_install_deb() {
-  local deb=$( maybe_fetch_archive "$@" ) &&
+  # NOTE: can't make deb local here because apparently, that overrides
+  # the exit status of the subshell, which makes && always succeed; this
+  # seems to be intended behavior (search for "Ivanov"):
+  # https://www.tldp.org/LDP/abs/html/localvar.html
+  deb=$( maybe_fetch_archive "$@" ) &&
     sudo dpkg --force-overwrite -i "$deb"
+  # NOTE: we have to explicitly set the return code here or else $? is
+  # used, which means 10 if the command is already installed and
+  # maybe_fetch_archive didn't fetch anything
+  status=$?
+  [ $status -eq 10 ] && return 0 || return $status
 }
 
 #-----------------------------------------------------------------------
