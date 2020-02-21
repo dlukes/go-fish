@@ -28,10 +28,14 @@ curl --proto '=https' --tlsv1.2 -sSf \
   GOFISH_FORCE=1 sh
 ```
 
-Alternatively, you can just clone this repo as `~/.config/fish` and
-install all or just some of the software by hand (or maybe it has
-already been installed by your system administrator). Here's a list of
-what's included, with links:
+By default, configuration files are installed only for the current user
+under `~/.config/fish`, but they can be set up system-wide by setting
+the environment variable `GOFISH_CONF_DIR=/etc/fish`.
+
+Alternatively, you can clone this repo as `~/.config/fish`, which will
+give you just the configuration files, and install all or some of the
+software by hand (or maybe it has already been installed by your system
+administrator). Here's a list of what's included, with links:
 
 - the [`fish` shell] itself
 - [`fasd`], a frecency sorter for your command line history
@@ -79,10 +83,10 @@ These are just highlights of what this particular config adds on top of
   of last command if abnormal (if it was a pipeline, then a status for
   each command), timing info for long-running commands, and git repo
   state
-- SSH keys configured in `config.fish` are pre-loaded upon first login
-  using `ssh-agent`, so that you don't have to repeatedly enter
+- SSH keys configured in `conf.d/go.fish` are pre-loaded upon first
+  login using `ssh-agent`, so that you don't have to repeatedly enter
   passphrases when they are used
-- ... and some more stuff, see `config.fish` and `functions/*`
+- ... and some more stuff, see `conf.d/go.fish` and `functions/*`
 
 # Troubleshooting Unicode glyphs in prompt
 

@@ -18,9 +18,14 @@ prefix=/usr/local
 mandir="$prefix/share/man/man1"
 bindir="$prefix/bin"
 
-fish_conf_dir="$HOME/.config/fish"
+if [ -z "$GOFISH_CONF_DIR" ]; then
+  GOFISH_CONF_DIR="$HOME/.config/fish"
+fi
+
 fonts_confd=/etc/fonts/conf.d
 fontconfig_overrides="$fonts_confd/00-overrides.conf"
+
+uid=$( id -u )
 
 #-----------------------------------------------------------------------
 # Functions
@@ -97,7 +102,8 @@ maybe_install_deb() {
 # Check that we're not running as root
 #-----------------------------------------------------------------------
 
-if [ $( id -u ) -eq 0 ]; then
+
+if [ "$uid" -eq 0 ]; then
   error "\
 This script should be run as a regular user, it will request sudo
 privileges where appropriate.\
@@ -132,29 +138,6 @@ set -x
 sudo mkdir -p "$mandir" "$bindir"
 
 #-----------------------------------------------------------------------
-# Clone fish config
-#-----------------------------------------------------------------------
-
-if [ -d "$fish_conf_dir" ]; then
-  disabled="$fish_conf_dir:disabled:$(date +%s)"
-  set +x
-  warning "\
-Moving existing fish configuration directory:
-
-$fish_conf_dir
-
-to:
-
-$disabled\
-" =
-  set -x
-  mv "$fish_conf_dir" "$disabled"
-fi
-mkdir -p "$fish_conf_dir"
-cd "$fish_conf_dir"
-git clone https://github.com/dlukes/go-fish .
-
-#-----------------------------------------------------------------------
 # Add fish PPA and install it:
 #-----------------------------------------------------------------------
 
@@ -163,6 +146,40 @@ if ! command -v fish >/dev/null || [ -n "$GOFISH_FORCE" ]; then
   sudo apt-get update
   sudo apt-get install -o Dpkg::Options::=--force-overwrite -y fish
 fi
+
+#-----------------------------------------------------------------------
+# Clone fish config
+#-----------------------------------------------------------------------
+
+conf_dir_parent="$GOFISH_CONF_DIR"
+while [ ! -d "$conf_dir_parent" ]; do
+  conf_dir_parent=$( dirname "$conf_dir_parent" )
+done
+
+if [ -w "$conf_dir_parent" ]; then
+  run_as="#$uid"
+else
+  run_as='#0'
+fi
+
+if [ -d "$GOFISH_CONF_DIR" ]; then
+  disabled="$GOFISH_CONF_DIR:disabled:$(date +%s)"
+  set +x
+  warning "\
+Moving existing fish configuration directory:
+
+$GOFISH_CONF_DIR
+
+to:
+
+$disabled\
+" =
+  set -x
+  sudo -u $run_as mv "$GOFISH_CONF_DIR" "$disabled"
+fi
+sudo -u $run_as mkdir -p "$GOFISH_CONF_DIR"
+cd "$GOFISH_CONF_DIR"
+sudo -u $run_as git clone https://github.com/dlukes/go-fish .
 
 #-----------------------------------------------------------------------
 # Perform all custom downloads in a temporary working directory
