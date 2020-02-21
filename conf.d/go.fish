@@ -78,7 +78,7 @@ set -g __fish_git_prompt_showstashstate
 # TODO: set paths to ssh keys to pre-load on first login
 set -l ssh_keys ~/.ssh/id_rsa
 if type -q ssh-agent
-  set -l ssh_agent_env /tmp/ssh-agent.env.(id -u)
+  set -l ssh_agent_env /tmp/ssh-agent.fishenv.(id -u)
 
   if not set -q SSH_AUTH_SOCK
     test -r $ssh_agent_env && source $ssh_agent_env
