@@ -67,7 +67,7 @@ error() {
   log "$msg" '\e[31m' "$sep"
 }
 
-# Fetch installation archive if cmd is not available, else return 2.
+# Fetch installation archive if cmd is not available, else return 10.
 maybe_fetch_archive() {
   local cmd="$1"
   local repo="$2"
