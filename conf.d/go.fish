@@ -34,7 +34,7 @@ set -l path \
   /usr/local/Cellar/{coreutils,gnu-tar,grep,gawk,gnu-sed,findutils}/**/gnubin
 for p in $path[-1..1]
   if not contains $p $PATH
-    set PATH $p $PATH
+    set --prepend PATH $p
   end
 end
 
