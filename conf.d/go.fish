@@ -1,3 +1,7 @@
+# make sure a UTF-8 locale is set, so that non-ASCII characters in the
+# prompt render properly
+set -gx LC_ALL en_US.utf-8
+
 # color theme: sorin, originally a zsh prompt theme from
 # https://github.com/sorin-ionescu/prezto
 set fish_color_autosuggestion 969896
@@ -34,15 +38,15 @@ set -l path \
   /usr/local/Cellar/{coreutils,gnu-tar,grep,gawk,gnu-sed,findutils}/**/gnubin
 for p in $path[-1..1]
   if not contains $p $PATH
-    set --prepend PATH $p
+    set -gx --prepend PATH $p
   end
 end
 
 # pager
-set --export PAGER less
+set -gx PAGER less
 
 # python
-set --export VIRTUAL_ENV_DISABLE_PROMPT 1
+set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 
 # preexec hook to update database of frecently visited directories/files
 if type -q fasd
