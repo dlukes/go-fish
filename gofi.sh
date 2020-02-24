@@ -85,10 +85,13 @@ maybe_fetch_archive() {
 }
 
 maybe_install_deb() {
-  # NOTE: can't make deb local here because apparently, that overrides
-  # the exit status of the subshell, which makes && always succeed; this
-  # seems to be intended behavior (search for "Ivanov"):
+  # NOTE: declare deb as local in a separate statement first, otherwise
+  # local would override the exit status of the subshell, which would
+  # make && always succeed; cf.
+  # https://wiki.ubuntu.com/DashAsBinSh#local,
   # https://www.tldp.org/LDP/abs/html/localvar.html
+  local deb
+  local status
   deb=$( maybe_fetch_archive "$@" ) &&
     sudo dpkg --force-overwrite -i "$deb"
   # NOTE: we have to explicitly set the return code here or else $? is
