@@ -1,6 +1,7 @@
 # make sure a UTF-8 locale is set, so that non-ASCII characters in the
 # prompt render properly
-set -gx LC_ALL en_US.utf-8
+set -gx LANG en_US.utf-8
+set -gx LC_ALL $LANG
 
 # color theme: sorin, originally a zsh prompt theme from
 # https://github.com/sorin-ionescu/prezto
