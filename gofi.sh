@@ -210,7 +210,7 @@ set -x
 # fetched separately and *first*, because once the fzf binary is
 # available, the command -v check in maybe_fetch_archive will succeed
 # and the conditional block will be skipped
-fzf_source_archive=$( maybe_fetch_archive fzf junegunn/fzf '.*?\.tar\.gz' ) && {
+fzf_source_archive=$( maybe_fetch_archive fzf junegunn/fzf 'archive/refs/tags/.*?\.tar\.gz' ) && {
   tar xzf "$fzf_source_archive"
   sudo mv fzf-*/man/man1/fzf.1 "$mandir"
   fzf_share="$prefix/share/fzf"
@@ -220,7 +220,7 @@ fzf_source_archive=$( maybe_fetch_archive fzf junegunn/fzf '.*?\.tar\.gz' ) && {
   update_man_db=1
 }
 
-fzf_binary_archive=$( maybe_fetch_archive fzf junegunn/fzf-bin 'fzf-.*?-linux_amd64.tgz' ) && {
+fzf_binary_archive=$( maybe_fetch_archive fzf junegunn/fzf-bin 'fzf-.*?-linux_amd64.tar.gz' ) && {
   tar xzf "$fzf_binary_archive"
   sudo mv fzf "$bindir"
 }
@@ -242,20 +242,16 @@ fasd_archive=$( maybe_fetch_archive fasd clvv/fasd '.*?\.tar\.gz' ) && {
 
 repo=ogham/exa
 
-# additional resources are only in the source release, so it has to be
-# fetched separately and *first*, because once the exa binary is
-# available, the command -v check in maybe_fetch_archive will succeed
-# and the conditional block will be skipped
-exa_source_archive=$( maybe_fetch_archive exa "$repo" '.*?\.tar\.gz' ) && {
-  tar xzf "$exa_source_archive"
-  sudo mv exa-*/contrib/man/exa.1 "$mandir"
-  sudo mv exa-*/contrib/completions.fish /usr/share/fish/completions/exa.fish
-  update_man_db=1
-}
-
 exa_binary_archive=$( maybe_fetch_archive exa "$repo" 'exa-linux-x86_64-.*?\.zip' ) && {
+  mkdir exa
+  mv "$exa_binary_archive" exa
+  cd exa
   unzip "$exa_binary_archive"
-  sudo mv exa-linux-x86_64 "$bindir/exa"
+  sudo mv man/* "$mandir"
+  sudo mv bin/* "$bindir"
+  sudo mv completions/exa.fish /usr/share/fish/completions/
+  cd -
+  update_man_db=1
 }
 
 #-----------------------------------------------------------------------
